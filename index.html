@@ -98,10 +98,10 @@
 
   <script>
     const app = document.getElementById("app");
-    const myTodos = JSON.parse(localStorage.getItem('myTodos'));
+    const myTodos = JSON.parse(localStorage.getItem('myTodos')) || [];
 
     let todoObject = {
-      todos: myTodos || [],
+      todos: myTodos,
       add: function (todo) {
         this.todos.push({
           completed: false,
