@@ -74,6 +74,10 @@
     outline: none;
   }
 
+  .task {
+    font-size: 14px;
+  }
+
   .crossed {
     position: relative;
   }
@@ -139,7 +143,7 @@
                 ${todo.completed ? "✔" : ""}
               </button>
               <span
-                class="${todo.completed === true ? "crossed" : ""}"
+                class="task ${todo.completed === true ? "crossed" : ""}"
               >
                 ${todo.task}
               </span>
