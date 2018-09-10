@@ -47,6 +47,10 @@
     border-radius: 5px;
   }
 
+  #todoInput:focus {
+    outline: 3px dotted #555;
+  }
+
   .list-item {
     width: 100%;
     list-style: none;
@@ -71,42 +75,47 @@
   }
 
   .toggle:focus {
-    outline: none;
+    outline: 3px dotted #555;
   }
 
   .task {
     font-size: 15px;
+    text-align: center;
+    background: none;
+    border: none;
+    outline: none;
+    color: #fff;
+    width: 100%;
   }
 
   .crossed {
-    position: relative;
-  }
-
-  .crossed::after {
-    border-bottom: 5px solid rgba(209, 48, 48, 0.747);
-    content: "";
-    left: 0;
-    right: 0;
-    top: 47%;
-    position: absolute;
+    font-style: italic;
+    color: rgba(209, 48, 48, 0.747);
+    transform: skewX(-10deg);
   }
 
   .delete {
     margin-left: 20px;
+    padding: 0;
     color: rgba(209, 48, 48, 0.747);
+    background: none;
+    border: none;
     font-weight: bold;
     text-align: center;
     cursor: pointer;
     height: 40px;
     width: 40px;
-    transform: translateY(10px);
+  }
+
+  .delete:focus {
+    outline: 3px dotted #555;
   }
 </style>
 
 <body>
 
   <div class="container">
-    <input id="todoInput" type="text" placeholder="write your todo here" onkeypress="validateTodo(event)">
+    <input id="todoInput" type="text" placeholder="write your todo here" onkeyup="validateTodo(event)">
     <div id="app"></div>
   </div>
 
@@ -114,7 +123,7 @@
     const app = document.getElementById("app");
     const myTodos = JSON.parse(localStorage.getItem('myTodos')) || [];
 
-    let todoObject = {
+    const todoObject = {
       todos: myTodos,
       add: function (todo) {
         this.todos.push({
@@ -142,18 +151,20 @@
               >
                 ${todo.completed ? "✔" : ""}
               </button>
-              <span
+              <input
+                type="text"
                 class="task ${todo.completed === true ? "crossed" : ""}"
+                value="${todo.task}"
+                data-index="${todoObject.todos.indexOf(todo)}"
+                onkeyup="editTodo(event)"
               >
-                ${todo.task}
-              </span>
-              <span
+              <button
                 class="delete"
                 data-index="${todoObject.todos.indexOf(todo)}"
                 onclick="deleteTodo(event)"
               >
                 ✘
-              </span>
+              </button>
             </li>
           `).join("")}</ul>
         `;
@@ -183,7 +194,12 @@
       writeTodos();
     }
 
-    writeTodos();
+    function editTodo(e) {
+      const index = e.target.dataset.index;
+      todoObject.todos[index].task = e.target.value;
+    }
+
+    window.onload = writeTodos;
 
   </script>
 </body>
