@@ -147,9 +147,9 @@
           <ul>${todoObject.todos.map(todo => `
             <li class="list-item">
               <button
-              class="toggle ${todo.completed ? "done" : ""}"
-              data-index="${todoObject.todos.indexOf(todo)}"
-              onclick="toggleTodos(event)"
+                class="toggle ${todo.completed ? "done" : ""}"
+                data-index="${todoObject.todos.indexOf(todo)}"
+                onclick="toggleTodos(event)"
               >
                 ${todo.completed ? "✓️" : ""}
               </button>
