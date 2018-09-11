@@ -151,7 +151,7 @@
               data-index="${todoObject.todos.indexOf(todo)}"
               onclick="toggleTodos(event)"
               >
-                ${todo.completed ? "✔" : ""}
+                ${todo.completed ? "✓️" : ""}
               </button>
               <input
                 type="text"
@@ -199,6 +199,7 @@
     function editTodo(e) {
       const index = e.target.dataset.index;
       todoObject.todos[index].task = e.target.value;
+      localStorage.setItem('myTodos', JSON.stringify(myTodos));
     }
 
     window.onload = writeTodos;
