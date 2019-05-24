@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Todo App</title>
+  <link rel="shortcut icon" type="image/png" href="/icon.png" />
+</head>
+
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    color: #fff;
+  }
+
+  body {
+    background: #333;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    width: 95%;
+    max-width: 500px;
+    margin: 15px auto 0 auto;
+    padding: 15px 10px;
+    box-shadow: 5px 8px 5px rgba(0, 0, 0, .07);
+    border-radius: 5px;
+    background: #252525;
+  }
+
+  #todoInput {
+    width: 100%;
+    height: 40px;
+    padding: 0 20px;
+    margin: 0px auto 50px auto;
+    font-size: 16px;
+    background: #ddd;
+    border-radius: 5px;
+  }
+
+  #todoInput:focus {
+    outline: none;
+  }
+
+  .list-item {
+    width: 100%;
+    list-style: none;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .toggle {
+    appearance: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: bold;
+    background: #333;
+    color: #0e6349;
+    cursor: pointer;
+  }
+
+  .toggle:focus {
+    outline: 1px dotted #555;
+  }
+
+  .done {
+    background: none;
+    border: none;
+  }
+
+  .task {
+    font-size: 16px;
+    text-align: center;
+    background: none;
+    border: none;
+    outline: none;
+    color: #fff;
+    width: 100%;
+  }
+
+  .crossed {
+    font-style: italic;
+    color: #555;
+    text-decoration: line-through;
+  }
+
+  .delete {
+    color: rgba(209, 48, 48, 0.747);
+    background: none;
+    border: none;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
+  }
+
+  .delete:focus {
+    outline: 1px dotted #555;
+  }
+</style>
+
+<body>
+
+  <div class="container">
+    <div id="app"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/5.5.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.5.2/firebase-firestore.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyDsZYLKQsDHK1JgmIOOvG0Mjp992yV6gkk",
+      authDomain: "todo-app-e7e90.firebaseapp.com",
+      databaseURL: "https://todo-app-e7e90.firebaseio.com",
+      projectId: "todo-app-e7e90",
+      storageBucket: "todo-app-e7e90.appspot.com",
+      messagingSenderId: "824085140966"
+    };
+    firebase.initializeApp(config);
+    // additional config
+    const db = firebase.firestore();
+    db.settings({ timestampsInSnapshots: true });
+  </script>
+  <script>
+    // my app
+    function drawMyApp(data) {
+      const app = document.getElementById("app");
+      const myTodos = [];
+      data.forEach(doc => {
+        myTodos.push(doc.data());
+      });
+
+      const todoObject = {
+        todos: myTodos,
+        add: function (todo) {
+          this.todos.push({
+            completed: false,
+            task: todo
+          });
+        },
+        toggleCompleted: function (index) {
+          this.todos[index].completed = !this.todos[index].completed;
+        },
+        del: function (index) {
+          this.todos.splice(index, 1);
+        }
+      };
+
+      function validateTodo(e) {
+        const input = e.target;
+        if (e.keyCode === 13) {
+          db.collection("myTodos").add({
+            completed: false,
+            task: input.value
+          })
+          todoObject.add(input.value);
+          writeTodos();
+          input.value = "";
+        }
+      }
+
+      function toggleTodos(e) {
+        const index = e.target.dataset.index;
+        todoObject.toggleCompleted(index);
+
+        writeTodos();
+      }
+
+      function deleteTodo(e) {
+        const index = e.target.dataset.index;
+        todoObject.del(index);
+
+        writeTodos();
+      }
+
+      function editTodo(e) {
+        const index = e.target.dataset.index;
+        todoObject.todos[index].task = e.target.value;
+
+      }
+
+      function writeTodos() {
+        app.innerHTML = "";
+        app.innerHTML = `
+          <input id="todoInput" type="text" placeholder="write your todo here" onkeyup="validateTodo(event)">
+          <ul>${todoObject.todos.map(todo => `
+            <li class="list-item">
+              <button
+                class="toggle ${todo.completed ? "done" : ""}"
+                data-index="${todoObject.todos.indexOf(todo)}"
+                onclick="toggleTodos(event)"
+              >
+                ${todo.completed ? "✓️" : ""}
+              </button>
+              <input
+                type="text"
+                class="task ${todo.completed === true ? "crossed" : ""}"
+                value="${todo.task}"
+                data-index="${todoObject.todos.indexOf(todo)}"
+                onkeyup="editTodo(event)"
+              >
+              <button
+                class="delete"
+                data-index="${todoObject.todos.indexOf(todo)}"
+                onclick="deleteTodo(event)"
+              >
+                ✘
+              </button>
+            </li>
+          `).join("")}</ul>
+        `;
+      }
+
+      writeTodos();
+    }
+    // GET data
+    db.collection("myTodos").get()
+      .then(snapshot => drawMyApp(snapshot.docs));
+
+  </script>
+</body>
+
+</html>

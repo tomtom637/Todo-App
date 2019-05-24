@@ -1,151 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Todo App</title>
+    <link rel="shortcut icon" type="image/png" href="/icon.png" />
+    <style>
+      @import url("https://fonts.googleapis.com/css?family=Cookie&display=swap");
+    </style>
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Todo App</title>
-  <link rel="shortcut icon" type="image/png" href="/icon.png" />
-</head>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-<style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+    html {
+      font-family: "Cookie", cursive;
+      color: #fff;
+    }
 
-  html {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    color: #fff;
-  }
+    body {
+      background: #333;
+    }
 
-  body {
-    background: #333;
-  }
+    .container {
+      display: flex;
+      flex-direction: column;
+      width: 95%;
+      max-width: 500px;
+      margin: 15px auto 0 auto;
+      padding: 15px 10px;
+      box-shadow: 5px 8px 5px rgba(0, 0, 0, 0.07);
+      border-radius: 5px;
+      background: #252525;
+    }
 
-  .container {
-    display: flex;
-    flex-direction: column;
-    width: 95%;
-    max-width: 500px;
-    margin: 15px auto 0 auto;
-    padding: 15px 10px;
-    box-shadow: 5px 8px 5px rgba(0, 0, 0, .07);
-    border-radius: 5px;
-    background: #252525;
-  }
+    #todoInput {
+      width: 100%;
+      height: 40px;
+      padding: 0 20px;
+      margin: 0px auto 50px auto;
+      font-size: 16px;
+      background: #ddd;
+      border-radius: 5px;
+    }
 
-  #todoInput {
-    width: 100%;
-    height: 40px;
-    padding: 0 20px;
-    margin: 0px auto 50px auto;
-    font-size: 16px;
-    background: #ddd;
-    border-radius: 5px;
-  }
+    #todoInput:focus {
+      outline: none;
+    }
 
-  #todoInput:focus {
-    outline: none;
-  }
+    .list-item {
+      width: 100%;
+      list-style: none;
+      margin-bottom: 5px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-  .list-item {
-    width: 100%;
-    list-style: none;
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #333;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    .toggle {
+      appearance: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 5px;
+      font-size: 20px;
+      font-weight: bold;
+      background: #333;
+      color: #0e6349;
+      cursor: pointer;
+    }
 
-  .toggle {
-    appearance: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 5px;
-    font-size: 20px;
-    font-weight: bold;
-    background: #333;
-    color: #0e6349;
-    cursor: pointer;
-  }
+    .toggle:focus {
+      outline: 1px dotted #555;
+    }
 
-  .toggle:focus {
-    outline: 1px dotted #555;
-  }
+    .done {
+      background: none;
+      border: none;
+    }
 
-  .done {
-    background: none;
-    border: none;
-  }
+    .task {
+      font-size: 16px;
+      text-align: center;
+      background: none;
+      border: none;
+      outline: none;
+      color: #fff;
+      width: 100%;
+    }
 
-  .task {
-    font-size: 16px;
-    text-align: center;
-    background: none;
-    border: none;
-    outline: none;
-    color: #fff;
-    width: 100%;
-  }
+    .crossed {
+      font-style: italic;
+      color: #555;
+      text-decoration: line-through;
+    }
 
-  .crossed {
-    font-style: italic;
-    color: #555;
-    text-decoration: line-through;
-  }
+    .delete {
+      color: rgba(209, 48, 48, 0.747);
+      background: none;
+      border: none;
+      font-weight: bold;
+      text-align: center;
+      cursor: pointer;
+      height: 30px;
+      width: 30px;
+    }
 
-  .delete {
-    color: rgba(209, 48, 48, 0.747);
-    background: none;
-    border: none;
-    font-weight: bold;
-    text-align: center;
-    cursor: pointer;
-    height: 30px;
-    width: 30px;
-  }
+    .delete:focus {
+      outline: 1px dotted #555;
+    }
+  </style>
 
-  .delete:focus {
-    outline: 1px dotted #555;
-  }
-</style>
+  <body>
+    <div class="container">
+      <input
+        id="todoInput"
+        type="text"
+        placeholder="write your todo here"
+        onkeyup="validateTodo(event)"
+      />
+      <div id="app"></div>
+    </div>
 
-<body>
+    <script>
+      const app = document.getElementById("app");
+      const myTodos = JSON.parse(localStorage.getItem("myTodos")) || [];
 
-  <div class="container">
-    <input id="todoInput" type="text" placeholder="write your todo here" onkeyup="validateTodo(event)">
-    <div id="app"></div>
-  </div>
-
-  <script>
-    const app = document.getElementById("app");
-    const myTodos = JSON.parse(localStorage.getItem('myTodos')) || [];
-
-    const todoObject = {
-      todos: myTodos,
-      add: function (todo) {
-        this.todos.push({
-          completed: false,
-          task: todo
-        });
-      },
-      toggleCompleted: function (index) {
-        this.todos[index].completed = !this.todos[index].completed;
-      },
-      del: function (index) {
-        this.todos.splice(index, 1);
+      class TodoObject {
+        constructor(todos) {
+          this.todos = myTodos;
+        }
+        add(todo) {
+          this.todos.unshift({ completed: false, task: todo });
+        }
+        toggleCompleted(index) {
+          this.todos[index].completed = !this.todos[index].completed;
+        }
+        del(index) {
+          this.todos.splice(index, 1);
+        }
       }
-    };
 
-    function writeTodos() {
-      app.innerHTML = "";
-      app.innerHTML = `
-          <ul>${todoObject.todos.map(todo => `
+      const todoObject = new TodoObject();
+
+      function writeTodos() {
+        app.innerHTML = `
+          <ul>${todoObject.todos
+            .map(
+              todo => `
             <li class="list-item">
               <button
                 class="toggle ${todo.completed ? "done" : ""}"
@@ -169,43 +177,44 @@
                 ✘
               </button>
             </li>
-          `).join("")}</ul>
+          `
+            )
+            .join("")}
+          </ul>
         `;
-    }
-
-    function validateTodo(e) {
-      const input = document.getElementById("todoInput");
-      if (e.keyCode === 13) {
-        todoObject.add(input.value);
-        localStorage.setItem('myTodos', JSON.stringify(myTodos));
-        writeTodos();
-        input.value = "";
       }
-    }
 
-    function toggleTodos(e) {
-      const index = e.target.dataset.index;
-      todoObject.toggleCompleted(index);
-      localStorage.setItem('myTodos', JSON.stringify(myTodos));
-      writeTodos();
-    }
+      function validateTodo(e) {
+        const input = document.getElementById("todoInput");
+        if (e.keyCode === 13) {
+          todoObject.add(input.value);
+          localStorage.setItem("myTodos", JSON.stringify(myTodos));
+          writeTodos();
+          input.value = "";
+        }
+      }
 
-    function deleteTodo(e) {
-      const index = e.target.dataset.index;
-      todoObject.del(index);
-      localStorage.setItem('myTodos', JSON.stringify(myTodos));
-      writeTodos();
-    }
+      function toggleTodos(e) {
+        const index = e.target.dataset.index;
+        todoObject.toggleCompleted(index);
+        localStorage.setItem("myTodos", JSON.stringify(myTodos));
+        writeTodos();
+      }
 
-    function editTodo(e) {
-      const index = e.target.dataset.index;
-      todoObject.todos[index].task = e.target.value;
-      localStorage.setItem('myTodos', JSON.stringify(myTodos));
-    }
+      function deleteTodo(e) {
+        const index = e.target.dataset.index;
+        todoObject.del(index);
+        localStorage.setItem("myTodos", JSON.stringify(myTodos));
+        writeTodos();
+      }
 
-    window.onload = writeTodos;
+      function editTodo(e) {
+        const index = e.target.dataset.index;
+        todoObject.todos[index].task = e.target.value;
+        localStorage.setItem("myTodos", JSON.stringify(myTodos));
+      }
 
-  </script>
-</body>
-
+      window.onload = writeTodos();
+    </script>
+  </body>
 </html>
