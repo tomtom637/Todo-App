@@ -6,9 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Todo App</title>
     <link rel="shortcut icon" type="image/png" href="/icon.png" />
-    <style>
-      @import url("https://fonts.googleapis.com/css?family=Cookie&display=swap");
-    </style>
   </head>
 
   <style>
@@ -19,7 +16,6 @@
     }
 
     html {
-      font-family: "Cookie", cursive;
       color: #fff;
     }
 
@@ -133,7 +129,7 @@
       const myTodos = JSON.parse(localStorage.getItem("myTodos")) || [];
 
       class TodoObject {
-        constructor(todos) {
+        constructor() {
           this.todos = myTodos;
         }
         add(todo) {
